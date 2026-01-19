@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import android.graphics.BitmapFactory
+import android.graphics.RectF
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
 import android.print.PageRange
@@ -16,6 +18,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 object TicketPrintHelper {
 
@@ -70,7 +73,12 @@ object TicketPrintHelper {
                 }
             }
 
+            private fun dpToPx(context: Context, dp: Float): Float {
+                return dp * context.resources.displayMetrics.density
+            }
+
             private fun drawTicket(canvas: Canvas, t: TicketModel, waktuCetak: String) {
+
                 val paintTitle = Paint().apply {
                     textSize = 18f
                     isFakeBoldText = true
@@ -100,10 +108,48 @@ object TicketPrintHelper {
                 val dateWidth = paintDate.measureText(dateText)
                 val dateX = (canvas.width - dateWidth) / 2
 
-                canvas.drawText(dateText, x, y, paintDate)
+                canvas.drawText(dateText, dateX, y, paintDate)
                 y += line
 
+                // ===== LOGO KANAN (di area header) =====
+                val logoBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo_company)
 
+                // ukuran logo (misal 40dp)
+                val logoSize = dpToPx(context, 30f)
+
+                // posisikan kanan atas dekat judul
+                val logoLeft = canvas.width - logoSize - dpToPx(context, 20f)
+                val logoTop = dpToPx(context, 18f)
+                val logoRect = RectF(logoLeft, logoTop, logoLeft + logoSize, logoTop + logoSize)
+
+                canvas.drawBitmap(logoBitmap, null, logoRect, null)
+
+
+                // ===== WATERMARK TILE (BANYAK KECIL) =====
+                canvas.save()
+                try {
+                    // miringkan watermark (opsional)
+                    canvas.rotate(-30f, canvas.width / 2f, canvas.height / 2f)
+
+                    val wmBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.watermark_logo)
+                    val wmSize = dpToPx(context, 60f)
+                    val spacing = dpToPx(context, 90f)
+
+                    val wmPaint = Paint().apply { alpha = 25 }
+
+                    var yPos = -wmSize
+                    while (yPos < canvas.height + wmSize) {
+                        var xPos = -wmSize
+                        while (xPos < canvas.width + wmSize) {
+                            val rect = RectF(xPos, yPos, xPos + wmSize, yPos + wmSize)
+                            canvas.drawBitmap(wmBitmap, null, rect, wmPaint)
+                            xPos += spacing
+                        }
+                        yPos += spacing
+                    }
+                } finally {
+                    canvas.restore()
+                }
 
                 val title  = "BORDING PASS"
                 val title2 = "UNTUK KENDARAAN"
