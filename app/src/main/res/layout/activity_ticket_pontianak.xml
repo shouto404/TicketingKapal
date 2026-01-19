@@ -130,7 +130,7 @@
                     android:id="@+id/tilGolongan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Golongan"
+                    android:hint="    Golongan"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"

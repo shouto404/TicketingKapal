@@ -10,6 +10,7 @@ android {
         version = release(36)
     }
 
+
     defaultConfig {
         applicationId = "com.example.ticketkapal"
         minSdk = 23
@@ -39,6 +40,21 @@ android {
     buildFeatures {
         compose = true
     }
+    android {
+        packaging {
+            resources {
+                excludes.addAll(
+                    listOf(
+                        "META-INF/DEPENDENCIES",
+                        "META-INF/NOTICE",
+                        "META-INF/LICENSE",
+                        "META-INF/LICENSE.txt",
+                        "META-INF/NOTICE.txt"
+                    )
+                )
+            }
+        }
+    }
 }
 
 dependencies {
@@ -54,6 +70,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("net.sourceforge.jexcelapi:jxl:2.6.12")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

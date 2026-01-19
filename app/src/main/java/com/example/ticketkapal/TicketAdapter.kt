@@ -16,6 +16,8 @@ class TicketAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val kode = view.findViewById<TextView>(R.id.txtKode)
         val tiket = view.findViewById<TextView>(R.id.txtNoTiket)
+
+        val tanggalBuat = view.findViewById<TextView>(R.id.txtTanggalBuat)
         val tanggal = view.findViewById<TextView>(R.id.txtTanggal)
         val nama = view.findViewById<TextView>(R.id.txtNama)
         val plat = view.findViewById<TextView>(R.id.txtPlat)
@@ -23,6 +25,7 @@ class TicketAdapter(
         val berat = view.findViewById<TextView>(R.id.txtBerat)
         val harga = view.findViewById<TextView>(R.id.txtHarga)
         val btnPrint = view.findViewById<Button>(R.id.btnPrint)
+
 
         val rowRoot = view.findViewById<LinearLayout>(R.id.rowRoot)
     }
@@ -40,6 +43,7 @@ class TicketAdapter(
 
         holder.kode.text = t.kodeBooking
         holder.tiket.text = t.noTiket
+        holder.tanggalBuat.text = t.tanggalBuat
         holder.tanggal.text = t.tanggalBerlaku
         holder.nama.text = t.nama
         holder.plat.text = t.noPolisi

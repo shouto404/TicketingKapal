@@ -24,6 +24,12 @@
             style="@style/TableCellModern" />
 
         <TextView
+            android:id="@+id/txtTanggalBuat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TableCellModern"/>
+
+        <TextView
             android:id="@+id/txtTanggal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

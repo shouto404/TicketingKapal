@@ -185,6 +185,7 @@ object TicketPrintHelper {
                 canvas.drawText("--------------------------------------------------------------------------------------------------------------------------", x, y, paint); y += line
                 canvas.drawText("Keberangkatan", x, y, paint); y += line
                 canvas.drawText("PONTIANAK - PATIMBAN", x, y, paint); y += line
+                canvas.drawText("Tanggal Buat    : ${t.tanggalBuat}", x, y, paint); y += line
                 canvas.drawText("Tanggal Berlaku : ${t.tanggalBerlaku}", x, y, paint); y += line
                 canvas.drawText("Kode Booking : ${t.kodeBooking}", x, y, paint); y += line
                 canvas.drawText("No Tiket     : ${t.noTiket}", x, y, paint); y += line

@@ -8,6 +8,9 @@ import android.widget.ArrayAdapter
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TicketPontianak : AppCompatActivity() {
 
@@ -27,13 +30,22 @@ class TicketPontianak : AppCompatActivity() {
 
         val golonganList = arrayOf(
             "Golongan I",
-            "Golongan II",
+            "Golongan II A",
+            "Golongan II B",
             "Golongan III",
-            "Golongan IV",
-            "Golongan V",
-            "Golongan VI",
-            "Golongan VII",
-            "Golongan VIII"
+            "Golongan IV A",
+            "Golongan IV B",
+            "Golongan V A",
+            "Golongan V B",
+            "Golongan V C",
+            "Golongan VI A",
+            "Golongan VI B",
+            "Golongan VI C",
+            "Golongan VII A",
+            "Golongan VII B",
+            "Golongan VII C",
+            "Golongan VIII",
+            "Golongan AB"
         )
 
         val golAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, golonganList)
@@ -45,7 +57,10 @@ class TicketPontianak : AppCompatActivity() {
             DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
-                    edtTanggal.setText("$dayOfMonth/${month + 1}/$year")
+                    val dd = String.format("%02d", dayOfMonth)
+                    val mm = String.format("%02d", month + 1)
+                    edtTanggal.setText("$dd/$mm/$year")
+
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -58,6 +73,8 @@ class TicketPontianak : AppCompatActivity() {
 
         // ===== BUTTON SIMPAN =====
         btnSimpan.setOnClickListener {
+
+            val tanggalBuat = SimpleDateFormat("dd/MM/yyyy", Locale("id","ID")).format(Date())
 
             // ===== VALIDASI INPUT =====
             if (edtTanggal.text.toString().isEmpty()) {
@@ -104,24 +121,25 @@ class TicketPontianak : AppCompatActivity() {
 
             // ===== SIMPAN KE DATABASE =====
             val sql = """
-                INSERT INTO ticket 
-                (kode_booking, no_tiket, tanggal_berlaku, nama, no_polisi, golongan, berat, harga)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
+            INSERT INTO ticket
+            (kode_booking, no_tiket, tanggal_buat, tanggal_berlaku, nama, no_polisi, golongan, berat, harga)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """.trimIndent()
 
-            db.execSQL(
-                sql,
-                arrayOf(
-                    kodeBooking,
-                    noTiket,
-                    edtTanggal.text.toString(),
-                    edtNama.text.toString(),
-                    edtNoPlat.text.toString(),
-                    edtGolongan.text.toString(),
-                    edtBerat.text.toString(),
-                    edtHarga.text.toString()
-                )
-            )
+                    db.execSQL(
+                        sql,
+                        arrayOf(
+                            kodeBooking,
+                            noTiket,
+                            tanggalBuat, // tanggal buat tiket
+                            edtTanggal.text.toString(), // tanggal berlaku
+                            edtNama.text.toString(),
+                            edtNoPlat.text.toString(),
+                            edtGolongan.text.toString(),
+                            edtBerat.text.toString(),
+                            edtHarga.text.toString()
+                        )
+                    )
 
             Toast.makeText(
                 this,
