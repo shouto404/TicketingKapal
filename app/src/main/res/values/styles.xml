@@ -10,4 +10,25 @@
         <item name="android:padding">6dp</item>
         <item name="android:minWidth">120dp</item>
     </style>
+
+    <style name="TableHeaderModern">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#0B2545</item>
+        <item name="android:minWidth">140dp</item>
+    </style>
+
+    <style name="TableCellModern">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#111827</item>
+        <item name="android:minWidth">140dp</item>
+    </style>
 </resources>

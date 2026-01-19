@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,8 @@ class TicketAdapter(
         val berat = view.findViewById<TextView>(R.id.txtBerat)
         val harga = view.findViewById<TextView>(R.id.txtHarga)
         val btnPrint = view.findViewById<Button>(R.id.btnPrint)
+
+        val rowRoot = view.findViewById<LinearLayout>(R.id.rowRoot)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,6 +46,12 @@ class TicketAdapter(
         holder.golongan.text = t.golongan
         holder.berat.text = t.berat
         holder.harga.text = t.harga
+
+        if (position % 2 == 0) {
+            holder.rowRoot.setBackgroundResource(R.drawable.bg_row_even)
+        } else {
+            holder.rowRoot.setBackgroundResource(R.drawable.bg_row_odd)
+        }
 
         holder.btnPrint.setOnClickListener {
             val ctx = holder.itemView.context

@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
+import android.widget.ArrayAdapter
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -17,10 +19,25 @@ class TicketPontianak : AppCompatActivity() {
         val edtTanggal = findViewById<EditText>(R.id.edtTanggal)
         val edtNama = findViewById<EditText>(R.id.edtNama)
         val edtNoPlat = findViewById<EditText>(R.id.edtNoPlat)
-        val edtGolongan = findViewById<EditText>(R.id.edtGolongan)
+        val edtGolongan = findViewById<MaterialAutoCompleteTextView>(R.id.edtGolongan)
         val edtBerat = findViewById<EditText>(R.id.edtBerat)
         val edtHarga = findViewById<EditText>(R.id.edtHarga)
         val btnSimpan = findViewById<Button>(R.id.btnSimpan)
+        val tilGolongan = findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilGolongan)
+
+        val golonganList = arrayOf(
+            "Golongan I",
+            "Golongan II",
+            "Golongan III",
+            "Golongan IV",
+            "Golongan V",
+            "Golongan VI",
+            "Golongan VII",
+            "Golongan VIII"
+        )
+
+        val golAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, golonganList)
+        edtGolongan.setAdapter(golAdapter)
 
         // ===== DATE PICKER =====
         val calendar = Calendar.getInstance()
@@ -61,8 +78,9 @@ class TicketPontianak : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            tilGolongan.error = null
             if (edtGolongan.text.toString().isEmpty()) {
-                edtGolongan.error = "Golongan tidak boleh kosong"
+                tilGolongan.error = "Golongan tidak boleh kosong"
                 edtGolongan.requestFocus()
                 return@setOnClickListener
             }
