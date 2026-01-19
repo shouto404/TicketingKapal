@@ -1,31 +1,28 @@
 package com.example.ticketkapal
 
-import android.content.Intent
+import android.app.DatePickerDialog
 import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import jxl.Workbook
-import jxl.write.Label
-import jxl.write.WritableWorkbook
+import java.util.Calendar
 
 class TicketListActivity : AppCompatActivity() {
 
+    private lateinit var dbHelper: TicketDatabaseHelper
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TicketAdapter
     private val list = ArrayList<TicketModel>()
-    private lateinit var dbHelper: TicketDatabaseHelper
 
-    private lateinit var exportLauncher: ActivityResultLauncher<Intent>
+    private lateinit var edtDari: EditText
+    private lateinit var edtSampai: EditText
+    private lateinit var btnFilter: Button
+    private lateinit var btnReset: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,55 +35,135 @@ class TicketListActivity : AppCompatActivity() {
         adapter = TicketAdapter(list)
         recyclerView.adapter = adapter
 
-        // ====== (kalau kamu sudah punya filter range / single, biarkan) ======
-        // loadTicketsAll() atau loadTicketsRangeTanggalBuat(...)
-        loadTicketsAll()
+        edtDari = findViewById(R.id.edtFilterDari)
+        edtSampai = findViewById(R.id.edtFilterSampai)
+        btnFilter = findViewById(R.id.btnFilterRange)
+        btnReset = findViewById(R.id.btnResetRange)
 
-        val btnExportExcel = findViewById<Button>(R.id.btnExportExcel)
-
-        // Launcher untuk pilih lokasi simpan file
-        exportLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val uri: Uri? = result.data?.data
-                if (uri != null) {
-                    exportCurrentListToExcel(uri)
-                }
+        // ====== DatePicker yang "pasti jalan" (touch listener) ======
+        edtDari.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                showDatePicker(edtDari)
             }
+            true // consume touch supaya EditText tidak fokus/keyboard
         }
 
-        btnExportExcel.setOnClickListener {
-            if (list.isEmpty()) {
-                Toast.makeText(this, "Data kosong, tidak bisa export.", Toast.LENGTH_SHORT).show()
+        edtSampai.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                showDatePicker(edtSampai)
+            }
+            true
+        }
+
+        // Load awal: semua data
+        loadTicketsAll()
+
+        // Filter range berdasarkan tanggal_buat
+        btnFilter.setOnClickListener {
+            val dari = edtDari.text.toString().trim()
+            val sampai = edtSampai.text.toString().trim()
+
+            if (dari.isEmpty()) {
+                edtDari.error = "Tanggal 'Dari' harus dipilih"
+                edtDari.requestFocus()
                 return@setOnClickListener
             }
 
-            val time = SimpleDateFormat("yyyyMMdd_HHmmss", Locale("id", "ID")).format(Date())
-            val fileName = "TicketKapal_$time.xls"
-
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                putExtra(Intent.EXTRA_TITLE, fileName)
+            if (sampai.isEmpty()) {
+                edtSampai.error = "Tanggal 'Sampai' harus dipilih"
+                edtSampai.requestFocus()
+                return@setOnClickListener
             }
-            exportLauncher.launch(intent)
+
+            // validasi sederhana format dd/MM/yyyy
+            if (!isValidDdMmYyyy(dari)) {
+                edtDari.error = "Format harus dd/MM/yyyy"
+                edtDari.requestFocus()
+                return@setOnClickListener
+            }
+            if (!isValidDdMmYyyy(sampai)) {
+                edtSampai.error = "Format harus dd/MM/yyyy"
+                edtSampai.requestFocus()
+                return@setOnClickListener
+            }
+
+            loadTicketsRangeTanggalBuat(dari, sampai)
+
+            if (list.isEmpty()) {
+                Toast.makeText(this, "Tidak ada tiket pada range $dari - $sampai", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Reset filter
+        btnReset.setOnClickListener {
+            edtDari.setText("")
+            edtSampai.setText("")
+            loadTicketsAll()
         }
     }
 
-    // ===================== LOAD DATA (contoh all) =====================
+    private fun showDatePicker(target: EditText) {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                val dd = String.format("%02d", dayOfMonth)
+                val mm = String.format("%02d", month + 1)
+                target.setText("$dd/$mm/$year")
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
     private fun loadTicketsAll() {
         list.clear()
         val db = dbHelper.readableDatabase
+
         val cursor = db.rawQuery(
             """
             SELECT kode_booking, no_tiket, tanggal_berlaku, tanggal_buat, nama, no_polisi, golongan, berat, harga
             FROM ticket
             ORDER BY id DESC
-            """.trimIndent(), null
+            """.trimIndent(),
+            null
         )
 
         addCursorToList(cursor)
         cursor.close()
         db.close()
+
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * Filter RANGE berdasarkan tanggal_buat (format tersimpan dd/MM/yyyy)
+     * Trick: convert dd/MM/yyyy -> yyyyMMdd saat query menggunakan substr()
+     */
+    private fun loadTicketsRangeTanggalBuat(dariDdMmYyyy: String, sampaiDdMmYyyy: String) {
+        list.clear()
+        val db = dbHelper.readableDatabase
+
+        val dariKey = ddMMyyyyToKey(dariDdMmYyyy)     // yyyyMMdd
+        val sampaiKey = ddMMyyyyToKey(sampaiDdMmYyyy) // yyyyMMdd
+
+        val cursor: Cursor = db.rawQuery(
+            """
+            SELECT kode_booking, no_tiket, tanggal_berlaku, tanggal_buat, nama, no_polisi, golongan, berat, harga
+            FROM ticket
+            WHERE (
+                substr(TRIM(tanggal_buat), 7, 4) || substr(TRIM(tanggal_buat), 4, 2) || substr(TRIM(tanggal_buat), 1, 2)
+            ) BETWEEN ? AND ?
+            ORDER BY id DESC
+            """.trimIndent(),
+            arrayOf(dariKey, sampaiKey)
+        )
+
+        addCursorToList(cursor)
+        cursor.close()
+        db.close()
+
         adapter.notifyDataSetChanged()
     }
 
@@ -95,69 +172,40 @@ class TicketListActivity : AppCompatActivity() {
             do {
                 list.add(
                     TicketModel(
-                        cursor.getString(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getString(4),
-                        cursor.getString(5),
-                        cursor.getString(6),
-                        cursor.getString(7),
-                        cursor.getString(8)
+                        cursor.getString(0), // kode_booking
+                        cursor.getString(1), // no_tiket
+                        cursor.getString(2), // tanggal_berlaku
+                        cursor.getString(3), // tanggal_buat
+                        cursor.getString(4), // nama
+                        cursor.getString(5), // no_polisi
+                        cursor.getString(6), // golongan
+                        cursor.getString(7), // berat
+                        cursor.getString(8)  // harga
                     )
                 )
             } while (cursor.moveToNext())
         }
     }
 
-    // ===================== EXPORT EXCEL =====================
-    private fun exportCurrentListToExcel(uri: Uri) {
-        try {
-            contentResolver.openOutputStream(uri)?.use { out ->
+    private fun ddMMyyyyToKey(ddMMyyyy: String): String {
+        // dd/MM/yyyy -> yyyyMMdd
+        val parts = ddMMyyyy.split("/")
+        val dd = parts[0]
+        val mm = parts[1]
+        val yyyy = parts[2]
+        return yyyy + mm + dd
+    }
 
-                val workbook: WritableWorkbook = Workbook.createWorkbook(out)
-                val sheet = workbook.createSheet("Daftar Tiket", 0)
-
-                val headers = arrayOf(
-                    "Kode Booking",
-                    "No Tiket",
-                    "Tanggal Berlaku",
-                    "Tanggal Buat",
-                    "Nama",
-                    "No Polisi",
-                    "Golongan",
-                    "Berat",
-                    "Harga"
-                )
-
-                // header row
-                for (c in headers.indices) {
-                    sheet.addCell(Label(c, 0, headers[c]))
-                }
-
-                // data rows
-                for (i in list.indices) {
-                    val t = list[i]
-                    val r = i + 1
-
-                    sheet.addCell(Label(0, r, t.kodeBooking))
-                    sheet.addCell(Label(1, r, t.noTiket))
-                    sheet.addCell(Label(2, r, t.tanggalBerlaku))
-                    sheet.addCell(Label(3, r, t.tanggalBuat))
-                    sheet.addCell(Label(4, r, t.nama))
-                    sheet.addCell(Label(5, r, t.noPolisi))
-                    sheet.addCell(Label(6, r, t.golongan))
-                    sheet.addCell(Label(7, r, t.berat))
-                    sheet.addCell(Label(8, r, t.harga))
-                }
-
-                workbook.write()
-                workbook.close()
-            }
-
-            Toast.makeText(this, "Export Excel berhasil ✅", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Export gagal: ${e.message}", Toast.LENGTH_LONG).show()
-        }
+    private fun isValidDdMmYyyy(value: String): Boolean {
+        // validasi ringan: 10 char dan ada 2 slash
+        if (value.length != 10) return false
+        if (value[2] != '/' || value[5] != '/') return false
+        val dd = value.substring(0, 2).toIntOrNull() ?: return false
+        val mm = value.substring(3, 5).toIntOrNull() ?: return false
+        val yyyy = value.substring(6, 10).toIntOrNull() ?: return false
+        if (yyyy < 1900) return false
+        if (mm !in 1..12) return false
+        if (dd !in 1..31) return false
+        return true
     }
 }

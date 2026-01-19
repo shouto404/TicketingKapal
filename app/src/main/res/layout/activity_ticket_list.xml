@@ -6,11 +6,20 @@
     android:orientation="vertical"
     android:background="#F1F5F9">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Daftar Tiket"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#0B2545"
+        android:padding="16dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,6 +34,8 @@
                 android:hint="Dari (dd/MM/yyyy)"
                 android:focusable="false"
                 android:clickable="true"
+                android:enabled="true"
+                android:inputType="none"
                 android:background="@android:drawable/edit_text"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"/>
@@ -37,6 +48,8 @@
                 android:hint="Sampai (dd/MM/yyyy)"
                 android:focusable="false"
                 android:clickable="true"
+                android:enabled="true"
+                android:inputType="none"
                 android:background="@android:drawable/edit_text"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
@@ -73,19 +86,11 @@
     </LinearLayout>
 
     <!-- APP BAR MINI -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Daftar Tiket"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="#0B2545"
-        android:padding="16dp"/>
-
     <!-- CARD TABLE -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_margin="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="6dp"
@@ -126,13 +131,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tanggal Buat"
+                        android:text="Tanggal Berlaku"
                         style="@style/TableHeaderModern"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tanggal Berlaku"
+                        android:text="Tanggal Buat"
                         style="@style/TableHeaderModern"/>
 
                     <TextView
@@ -183,7 +188,8 @@
             <HorizontalScrollView
                 android:id="@+id/bodyScroll"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:fillViewport="true">
 
                 <androidx.recyclerview.widget.RecyclerView
