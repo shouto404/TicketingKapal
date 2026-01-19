@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.TicketKapal" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0F4C81</item>
+        <item name="colorPrimaryVariant">#0B2545</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <item name="colorSecondary">#1FA774</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+    </style>
+</resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+        <TextView
+            android:id="@+id/txtKode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtNoTiket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtTanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtNama"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtPlat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtGolongan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtBerat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+        <TextView
+            android:id="@+id/txtHarga"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Cell"/>
+
+    <!-- Tombol PRINT di ujung -->
+    <Button
+        android:id="@+id/btnPrint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Print" />
+
+</LinearLayout>
