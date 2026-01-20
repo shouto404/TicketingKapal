@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
 
         btnPatimbanPontianak.setOnClickListener {
-            val intent = Intent(this, TicketPontianak::class.java)
+            val intent = Intent(this, TicketPatimban::class.java)
             intent.putExtra("RUTE", "Patimban - Pontianak")
             startActivity(intent)
         }

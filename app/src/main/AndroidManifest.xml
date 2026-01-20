@@ -25,6 +25,8 @@
 
         <activity android:name=".TicketPontianak" />
         <activity android:name=".TicketListActivity" />
+        <activity android:name=".TicketPatimban" />
+        <activity android:name=".TicketListPatimbanActivity" />
     </application>
 
 </manifest>

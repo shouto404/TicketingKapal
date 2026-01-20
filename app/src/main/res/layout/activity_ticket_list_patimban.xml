@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F1F5F9">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Daftar Tiket"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#0B2545"
+        android:padding="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtFilterDari"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:hint="Dari (dd/MM/yyyy)"
+                android:focusable="false"
+                android:clickable="true"
+                android:enabled="true"
+                android:inputType="none"
+                android:background="@android:drawable/edit_text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+
+            <EditText
+                android:id="@+id/edtFilterSampai"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:hint="Sampai (dd/MM/yyyy)"
+                android:focusable="false"
+                android:clickable="true"
+                android:enabled="true"
+                android:inputType="none"
+                android:background="@android:drawable/edit_text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <Button
+                android:id="@+id/btnFilterRange"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="Filter Range"/>
+
+            <Button
+                android:id="@+id/btnResetRange"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Reset"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnExportExcel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="Export ke Excel"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <!-- APP BAR MINI -->
+    <!-- CARD TABLE -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        app:cardUseCompatPadding="true"
+        android:backgroundTint="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- HEADER (IKUT HORIZONTAL) -->
+            <HorizontalScrollView
+                android:id="@+id/headerScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                android:background="@drawable/bg_table_header">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kode Booking"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Tiket"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tanggal Berlaku"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tanggal Buat"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nama"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Polisi"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Golongan"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Berat"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Harga"
+                        style="@style/TableHeaderModern"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Aksi"
+                        style="@style/TableHeaderModern"/>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Divider header -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#D1D5DB"/>
+
+            <!-- BODY (SCROLL VERTICAL + HORIZONTAL) -->
+            <HorizontalScrollView
+                android:id="@+id/bodyScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerTicket"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"/>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
