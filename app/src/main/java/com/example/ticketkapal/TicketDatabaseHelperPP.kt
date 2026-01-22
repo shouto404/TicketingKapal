@@ -13,6 +13,7 @@ class TicketDatabaseHelperPP(context: Context) :
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 kode_booking TEXT,
                 no_tiket TEXT,
+                no_urut INTEGER,
                 tanggal_buat TEXT,
                 tanggal_berlaku TEXT,
                 nama TEXT,

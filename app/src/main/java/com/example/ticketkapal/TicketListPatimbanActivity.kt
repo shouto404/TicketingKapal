@@ -95,7 +95,7 @@ class TicketListPatimbanActivity : AppCompatActivity() {
         val db = dbHelper.readableDatabase
         val cursor = db.rawQuery(
             """
-            SELECT kode_booking, no_tiket, tanggal_berlaku, tanggal_buat, nama, no_polisi, golongan, berat, harga
+            SELECT kode_booking, no_tiket, tanggal_buat, tanggal_berlaku,  nama, no_polisi, golongan, berat, harga
             FROM ticket_pp
             ORDER BY id DESC
             """.trimIndent(),
@@ -116,7 +116,7 @@ class TicketListPatimbanActivity : AppCompatActivity() {
 
         val cursor: Cursor = db.rawQuery(
             """
-            SELECT kode_booking, no_tiket, tanggal_berlaku, tanggal_buat, nama, no_polisi, golongan, berat, harga
+            SELECT kode_booking, no_tiket, tanggal_buat, tanggal_berlaku, nama, no_polisi, golongan, berat, harga
             FROM ticket_pp
             WHERE (
                 substr(TRIM(tanggal_buat), 7, 4) || substr(TRIM(tanggal_buat), 4, 2) || substr(TRIM(tanggal_buat), 1, 2)

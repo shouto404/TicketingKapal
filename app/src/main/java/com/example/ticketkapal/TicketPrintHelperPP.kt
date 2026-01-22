@@ -5,8 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
-import android.graphics.BitmapFactory
-import android.graphics.RectF
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
 import android.print.PageRange
@@ -19,14 +17,19 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
 object TicketPrintHelperPP {
 
     fun printTicket(context: Context, t: TicketModel) {
         val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-        val jobName = "Ticket_${t.noTiket}"
+        val jobName = "TicketPP_${t.noTiket}"
 
         val adapter = object : PrintDocumentAdapter() {
+
+            // ✅ 58mm thermal umumnya 384 dot (48mm printable)
+            private val pageWidthPx = 384
+
+            // ✅ bikin panjang ke bawah (naikkan kalau masih kepotong)
+            private val pageHeightPx = 3500
 
             override fun onLayout(
                 oldAttributes: PrintAttributes?,
@@ -48,179 +51,118 @@ object TicketPrintHelperPP {
                 cancellationSignal: CancellationSignal,
                 callback: WriteResultCallback
             ) {
-                val pdfDocument = PdfDocument()
-
-                // Ukuran A4 kira-kira (points). Cukup untuk text.
-                val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
-                val page = pdfDocument.startPage(pageInfo)
-
-                val dateTimeFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale("id", "ID"))
-                val waktuCetak = dateTimeFormat.format(Date())
-
-                drawTicket(page.canvas, t, waktuCetak)
-
-                pdfDocument.finishPage(page)
+                val pdf = PdfDocument()
 
                 try {
+                    val dpi = 203 // standar printer thermal
+                    val widthPx = (58f / 25.4f * dpi).toInt()   // ≈ 464px
+                    val heightPx = 1200
+                    // Ukuran A4 kira-kira (points). Cukup untuk text.
+                    val pageInfo = PdfDocument.PageInfo.Builder(widthPx, heightPx, 1).create()
+                    val page = pdf.startPage(pageInfo)
+
+                    val waktuCetak = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale("id", "ID"))
+                        .format(Date())
+
+                    drawTicket(page.canvas, t, waktuCetak)
+
+                    pdf.finishPage(page)
+
                     FileOutputStream(destination.fileDescriptor).use { out ->
-                        pdfDocument.writeTo(out)
+                        pdf.writeTo(out)
                     }
+
                     callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
                 } catch (e: Exception) {
                     callback.onWriteFailed(e.message)
                 } finally {
-                    pdfDocument.close()
+                    pdf.close()
                 }
-            }
-
-            private fun dpToPx(context: Context, dp: Float): Float {
-                return dp * context.resources.displayMetrics.density
             }
 
             private fun drawTicket(canvas: Canvas, t: TicketModel, waktuCetak: String) {
+                val x = 8f
+                var y = 26f
+                val line = 30f
 
-                val paintTitle = Paint().apply {
-                    textSize = 18f
+                val title = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    textSize = 30f
                     isFakeBoldText = true
                     typeface = Typeface.MONOSPACE
                 }
-                val paint = Paint().apply {
-                    textSize = 14f
+                val bold = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    textSize = 24f
+                    isFakeBoldText = true
                     typeface = Typeface.MONOSPACE
                 }
-                val paintSubTitle = Paint().apply {
-                    textSize = 14f
+                val normal = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    textSize = 22f
+                    typeface = Typeface.MONOSPACE
+                }
+                val small = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    textSize = 18f
+                    typeface = Typeface.MONOSPACE
                 }
 
-                var y = 50f
-                val x = 50f
-                val line = 26f
-
-
-                // Paint tanggal & jam
-                val paintDate = Paint().apply {
-                    textSize = 12f
+                fun center(text: String, p: Paint) {
+                    val cx = (canvas.width - p.measureText(text)) / 2f
+                    canvas.drawText(text, cx, y, p)
+                    y += line
                 }
 
-                val dateText = "Dicetak : $waktuCetak"
-
-                // Rata tengah
-                val dateWidth = paintDate.measureText(dateText)
-                val dateX = (canvas.width - dateWidth) / 2
-
-                canvas.drawText(dateText, dateX, y, paintDate)
-                y += line
-
-                // ===== LOGO KANAN (di area header) =====
-                val logoBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo_company)
-
-                // ukuran logo (misal 40dp)
-                val logoSize = dpToPx(context, 30f)
-
-                // posisikan kanan atas dekat judul
-                val logoLeft = canvas.width - logoSize - dpToPx(context, 20f)
-                val logoTop = dpToPx(context, 18f)
-                val logoRect = RectF(logoLeft, logoTop, logoLeft + logoSize, logoTop + logoSize)
-
-                canvas.drawBitmap(logoBitmap, null, logoRect, null)
-
-
-                // ===== WATERMARK TILE (BANYAK KECIL) =====
-                canvas.save()
-                try {
-                    // miringkan watermark (opsional)
-                    canvas.rotate(-30f, canvas.width / 2f, canvas.height / 2f)
-
-                    val wmBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.watermark_logo)
-                    val wmSize = dpToPx(context, 60f)
-                    val spacing = dpToPx(context, 90f)
-
-                    val wmPaint = Paint().apply { alpha = 25 }
-
-                    var yPos = -wmSize
-                    while (yPos < canvas.height + wmSize) {
-                        var xPos = -wmSize
-                        while (xPos < canvas.width + wmSize) {
-                            val rect = RectF(xPos, yPos, xPos + wmSize, yPos + wmSize)
-                            canvas.drawBitmap(wmBitmap, null, rect, wmPaint)
-                            xPos += spacing
-                        }
-                        yPos += spacing
-                    }
-                } finally {
-                    canvas.restore()
+                fun hr() {
+                    canvas.drawText("--------------------------------", x, y, normal)
+                    y += line
                 }
 
-                val title  = "BORDING PASS"
-                val title2 = "UNTUK KENDARAAN"
-                val bottom = "CV. WHENDY CHALISCO LOGISTIC"
-                val bottom1 = "Jl. PANGLIMA AIM KOMP. GRIYA PRATAM NO. 18"
-                val bottom2 = "WA: 08115612525"
-                val pageWidth = canvas.width
+                // tanggal cetak
+                center("Dicetak: $waktuCetak", small)
+                y += 6
 
-                paintTitle.isFakeBoldText = true
-                val textWidth = paintTitle.measureText(title)
-                val centerX = (pageWidth - textWidth) / 2
+                // judul
+                center("BOARDING PASS", title)
+                center("UNTUK KENDARAAN", bold)
+                hr()
 
-                canvas.drawText(title, centerX, y, paintTitle)
-                y += 30f
+                canvas.drawText("KEBERANGKATAN", x, y, bold); y += line
 
-                val textWidth2 = paintTitle.measureText(title2)
-                val centerX2 = (pageWidth - textWidth2) / 2
-                canvas.drawText(title2, centerX2, y, paintTitle)
-                y += 40f
+                // ✅ INI YANG BEDAKAN DENGAN PONTIANAK
+                canvas.drawText("PATIMBAN - PONTIANAK", x, y, bold); y += line
 
-//                // Baris 1
-//                val titleWidth1 = paintTitle.measureText(title)
-//                val titleX1 = (canvas.width - titleWidth1) / 2
-//                canvas.drawText(titleWidth1, titleX1, y, paintTitle)
-//                y += 30f
-//
-//// Baris 2
-//                val titleWidth2 = paintSubTitle.measureText(title2)
-//                val titleX2 = (canvas.width - titleWidth2) / 2
-//                canvas.drawText(titleWidth2, titleX2, y, paintSubTitle)
-//                y += 40f
+                hr()
 
-                canvas.drawText("--------------------------------------------------------------------------------------------------------------------------", x, y, paint); y += line
-                canvas.drawText("Keberangkatan", x, y, paint); y += line
-                canvas.drawText("PATIMBAN - PONTIANAK", x, y, paint); y += line
-                canvas.drawText("Tanggal Buat    : ${t.tanggalBuat}", x, y, paint); y += line
-                canvas.drawText("Tanggal Berlaku : ${t.tanggalBerlaku}", x, y, paint); y += line
-                canvas.drawText("Kode Booking : ${t.kodeBooking}", x, y, paint); y += line
-                canvas.drawText("No Tiket     : ${t.noTiket}", x, y, paint); y += line
-                canvas.drawText("Nama         : ${t.nama}", x, y, paint); y += line
-                canvas.drawText("No Polisi    : ${t.noPolisi}", x, y, paint); y += line
-                canvas.drawText("Golongan     : ${t.golongan}", x, y, paint); y += line
-                canvas.drawText("Berat        : ${t.berat}", x, y, paint); y += line
-                canvas.drawText("Harga        : ${t.harga}", x, y, paint); y += line
-                canvas.drawText("--------------------------------------------------------------------------------------------------------------------------", x, y, paint); y += line
+                canvas.drawText("Tgl Buat   : ${t.tanggalBuat}", x, y, normal); y += line
+                canvas.drawText("Tgl Berlaku: ${t.tanggalBerlaku}", x, y, normal); y += line
+                canvas.drawText("Kode       : ${t.kodeBooking}", x, y, normal); y += line
+                canvas.drawText("No Tiket   : ${t.noTiket}", x, y, normal); y += line
+                canvas.drawText("Nama       : ${t.nama}", x, y, normal); y += line
+                canvas.drawText("No Polisi  : ${t.noPolisi}", x, y, normal); y += line
+                canvas.drawText("Golongan   : ${t.golongan}", x, y, normal); y += line
+                canvas.drawText("Berat      : ${t.berat}", x, y, normal); y += line
+                canvas.drawText("Harga      : ${t.harga}", x, y, normal); y += line
 
-                y += line
-                canvas.drawText("Keterangan:", x, y, paintTitle); y += line
-                canvas.drawText("- Tunjukkan boarding pass saat naik kapal.", x, y, paint); y += line
-                canvas.drawText("- Pintu kapal akan ditutup 30 menit sebelum keberangkatan.", x, y, paint); y += line
-                canvas.drawText("- Harga tiket sudah termasuk asuransi.", x, y, paint); y += line
-                canvas.drawText("- Tiket tidak dapat dibatalkan.", x, y, paint); y += line
-                canvas.drawText("--------------------------------------------------------------------------------------------------------------------------", x, y, paint); y += line
+                hr()
+                canvas.drawText("KETERANGAN:", x, y, bold); y += line
+                canvas.drawText("- Tunjukkan boarding pass.", x, y, normal); y += line
+                canvas.drawText("- Pintu ditutup 30 menit sebelum", x, y, normal); y += line
+                canvas.drawText("  keberangkatan.", x, y, normal); y += line
+                canvas.drawText("- Harga termasuk asuransi.", x, y, normal); y += line
+                canvas.drawText("- Tiket tidak dapat dibatalkan.", x, y, normal); y += line
+                hr()
 
-                y += line * 3
-                val textWidth3 = paintTitle.measureText(bottom)
-                val centerX3 = (pageWidth - textWidth3) / 2
-                canvas.drawText(bottom, centerX3, y, paintTitle); y += line
-                val textWidth4 = paintTitle.measureText(bottom1)
-                val centerX4 = (pageWidth - textWidth4) / 2
-                canvas.drawText(bottom1, centerX4, y, paintTitle); y += line
-                val textWidth5 = paintTitle.measureText(bottom2)
-                val centerX5 = (pageWidth - textWidth5) / 2
-                canvas.drawText(bottom2, centerX5, y, paintTitle); y += line
-
-
+                y += 10
+                center("CV. WHENDY CHALISCO LOGISTIC", bold)
+                center("Jl. PANGLIMA AIM KOMP. GRIYA PRATAM NO. 18", small)
+                center("WA: 08115612525", bold)
             }
         }
 
+        // ✅ roll 58mm (mils). Height besar biar tidak diskalakan aneh.
+        val roll58 = PrintAttributes.MediaSize("ROLL_58", "Roll 58mm", 2283, 12000)
+
         val attributes = PrintAttributes.Builder()
-            .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+            .setMediaSize(roll58) // ✅ BUKAN ISO_A4
+            .setResolution(PrintAttributes.Resolution("thermal", "THERMAL", 203, 203))
             .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
             .build()
 

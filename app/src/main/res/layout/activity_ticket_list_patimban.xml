@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F1F5F9">
+    android:background="#232946">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:text="Daftar Tiket"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:textColor="#0B2545"
+        android:textColor="#fffffe"
         android:padding="16dp"/>
 
     <LinearLayout
@@ -32,6 +32,8 @@
                 android:layout_height="44dp"
                 android:layout_weight="1"
                 android:hint="Dari (dd/MM/yyyy)"
+                android:textColor="#0B2545"
+                android:textColorHint="#9E9E9E"
                 android:focusable="false"
                 android:clickable="true"
                 android:enabled="true"
@@ -46,6 +48,8 @@
                 android:layout_height="44dp"
                 android:layout_weight="1"
                 android:hint="Sampai (dd/MM/yyyy)"
+                android:textColorHint="#9E9E9E"
+                android:textColor="#0B2545"
                 android:focusable="false"
                 android:clickable="true"
                 android:enabled="true"
@@ -131,14 +135,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tanggal Berlaku"
+                        android:text="Tanggal Buat"
                         style="@style/TableHeaderModern"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tanggal Buat"
+                        android:text="Tanggal Berlaku"
                         style="@style/TableHeaderModern"/>
+
 
                     <TextView
                         android:layout_width="wrap_content"

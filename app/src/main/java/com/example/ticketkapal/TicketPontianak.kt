@@ -2,6 +2,7 @@ package com.example.ticketkapal
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.widget.*
 import android.widget.ArrayAdapter
@@ -117,13 +118,15 @@ class TicketPontianak : AppCompatActivity() {
             // ===== GENERATE KODE =====
             val db = dbHelper.writableDatabase
             val kodeBooking = generateKodeBooking()
-            val noTiket = generateNoTiket(db)
+            val (noTiket, noUrut) = generateNoTiketPontianak(db)
+
+
 
             // ===== SIMPAN KE DATABASE =====
             val sql = """
             INSERT INTO ticket
-            (kode_booking, no_tiket, tanggal_buat, tanggal_berlaku, nama, no_polisi, golongan, berat, harga)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (kode_booking, no_tiket, no_urut, tanggal_buat, tanggal_berlaku, nama, no_polisi, golongan, berat, harga)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
                     db.execSQL(
@@ -131,6 +134,7 @@ class TicketPontianak : AppCompatActivity() {
                         arrayOf(
                             kodeBooking,
                             noTiket,
+                            noUrut.toString(),
                             tanggalBuat, // tanggal buat tiket
                             edtTanggal.text.toString(), // tanggal berlaku
                             edtNama.text.toString(),
@@ -173,5 +177,32 @@ class TicketPontianak : AppCompatActivity() {
         val count = cursor.getInt(0) + 1
         cursor.close()
         return String.format("%011d", count)
+    }
+
+    private fun generateNoTiketPontianak(db: SQLiteDatabase): Pair<String, Int> {
+        val prefix = "TKT-PNK-PTBN"
+        val cal = Calendar.getInstance()
+        val bulan = String.format("%02d", cal.get(Calendar.MONTH) + 1) // 01-12
+        val tahun = cal.get(Calendar.YEAR).toString()
+
+        // cari urutan terakhir untuk bulan+tahun ini
+        val cursor = db.rawQuery(
+            """
+        SELECT MAX(no_urut) 
+        FROM ticket 
+        WHERE no_tiket LIKE ?
+        """.trimIndent(),
+            arrayOf("$prefix-$bulan-$tahun-%")
+        )
+
+        var last = 0
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            last = cursor.getInt(0)
+        }
+        cursor.close()
+
+        val next = last + 1
+        val noTiket = "$prefix-$bulan-$tahun-$next"
+        return Pair(noTiket, next)
     }
 }

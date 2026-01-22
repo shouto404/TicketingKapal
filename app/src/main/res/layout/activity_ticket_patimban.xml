@@ -56,7 +56,7 @@
             app:cardCornerRadius="16dp"
             app:cardElevation="6dp"
             app:cardUseCompatPadding="true"
-            android:backgroundTint="#FFFFFF">
+            android:backgroundTint="#121629">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -69,6 +69,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Tanggal Berlaku"
+                    app:hintTextColor="?attr/colorOnSurface"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -84,7 +86,8 @@
                         android:layout_height="wrap_content"
                         android:focusable="false"
                         android:clickable="true"
-                        android:inputType="none"/>
+                        android:inputType="none"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- NAMA -->
@@ -92,6 +95,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nama"
+                    android:textColor="#0B2545"
+                    app:hintTextColor="#64748B"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -103,7 +109,8 @@
                         android:id="@+id/edtNama"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPersonName"/>
+                        android:inputType="textPersonName"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- NO PLAT -->
@@ -111,6 +118,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="No. Polisi / Plat"
+                    android:textColor="#0B2545"
+                    app:hintTextColor="#64748B"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -122,7 +132,8 @@
                         android:id="@+id/edtNoPlat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapCharacters"/>
+                        android:inputType="textCapCharacters"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- GOLONGAN (DROPDOWN) -->
@@ -131,6 +142,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="    Golongan"
+                    android:textColor="#0B2545"
+                    app:hintTextColor="#64748B"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -145,7 +159,8 @@
                         android:layout_height="wrap_content"
                         android:inputType="none"
                         android:focusable="false"
-                        android:clickable="true" />
+                        android:clickable="true"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- BERAT -->
@@ -153,6 +168,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Berat (Kg)"
+                    android:textColor="#0B2545"
+                    app:hintTextColor="#64748B"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -164,7 +182,8 @@
                         android:id="@+id/edtBerat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"/>
+                        android:inputType="numberDecimal"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- HARGA -->
@@ -172,6 +191,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Harga (Rp)"
+                    android:textColor="#0B2545"
+                    app:hintTextColor="#64748B"
+                    app:boxStrokeColor="#CBD5E1"
                     app:boxBackgroundMode="outline"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -183,7 +205,8 @@
                         android:id="@+id/edtHarga"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"/>
+                        android:inputType="number"
+                        android:textColor="#fffffe"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- BUTTON SIMPAN -->
@@ -194,8 +217,8 @@
                     android:text="Simpan Ticket"
                     android:textAllCaps="false"
                     android:textStyle="bold"
-                    android:textColor="#121629"
-                    android:backgroundTint="#b8c1ec"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#232946"
                     app:cornerRadius="14dp"
                     android:layout_marginBottom="10dp"/>
 
